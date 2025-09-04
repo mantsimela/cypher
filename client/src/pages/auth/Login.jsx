@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Head from "@/layout/head/Head";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/context/AuthContext";
+import { buildApiUrl } from "@/config/api";
 import "./Login.css";
 import backgroundImage from "@/assets/images/grayTechyBkgrd.jpg";
 
@@ -30,10 +31,7 @@ const Login = () => {
     setError("");
     
     try {
-      const apiBaseUrl = window.location.hostname === 'localhost' 
-        ? 'http://localhost:3001'
-        : `${window.location.protocol}//${window.location.hostname.replace('-5000.', '-3001.')}${window.location.hostname.includes('replit.dev') ? '' : ':3001'}`;
-      const response = await fetch(`${apiBaseUrl}/api/v1/auth/login`, {
+      const response = await fetch(buildApiUrl('/auth/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

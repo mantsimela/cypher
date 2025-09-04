@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import timeoutManager, { sessionUtils } from '@/utils/timeoutManager';
+import { buildApiUrl } from '@/config/api';
 
 const AuthContext = createContext();
 
@@ -23,10 +24,7 @@ export const AuthProvider = ({ children }) => {
         // First check if AUTH_BYPASS is enabled on the backend
         try {
           console.log('🔍 Checking AUTH_BYPASS status...');
-          const apiBaseUrl = window.location.hostname === 'localhost' 
-            ? 'http://localhost:3001'
-            : `${window.location.protocol}//${window.location.hostname.replace('-5000.', '-3001.')}${window.location.hostname.includes('replit.dev') ? '' : ':3001'}`;
-          const bypassResponse = await fetch(`${apiBaseUrl}/health`, {
+          const bypassResponse = await fetch(buildApiUrl('/health'), {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -100,7 +98,7 @@ export const AuthProvider = ({ children }) => {
           // Validate token with server
           try {
             console.log('🔍 Validating existing token...');
-            const response = await fetch(`${apiBaseUrl}/api/v1/auth/validate`, {
+            const response = await fetch(buildApiUrl('/auth/validate'), {
               method: 'GET',
               headers: {
                 'Authorization': `Bearer ${token}`,

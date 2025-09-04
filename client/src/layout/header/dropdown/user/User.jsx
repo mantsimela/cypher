@@ -6,6 +6,7 @@ import UserAvatar from "@/components/user/UserAvatar";
 import { useTheme, useThemeUpdate } from "@/layout/provider/Theme";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { buildApiUrl } from "@/config/api";
 
 const User = () => {
   const theme = useTheme();
@@ -29,10 +30,7 @@ const User = () => {
       // Call logout API endpoint
       if (refreshToken) {
         console.log('📡 Calling logout API...');
-        const apiBaseUrl = window.location.hostname === 'localhost' 
-          ? 'http://localhost:3001'
-          : `${window.location.protocol}//${window.location.hostname.replace('-5000.', '-3001.')}${window.location.hostname.includes('replit.dev') ? '' : ':3001'}`;
-        await fetch(`${apiBaseUrl}/api/v1/auth/logout`, {
+        await fetch(buildApiUrl('/auth/logout'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

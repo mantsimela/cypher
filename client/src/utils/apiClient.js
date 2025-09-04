@@ -1,8 +1,7 @@
 import { toast } from "react-toastify";
+import { apiConfig, buildApiUrl } from '../config/api';
 
-const API_BASE_URL = window.location.hostname === 'localhost' 
-  ? 'http://localhost:3001/api/v1'
-  : `${window.location.protocol}//${window.location.hostname.replace('-5000.', '-3001.')}${window.location.hostname.includes('replit.dev') ? '' : ':3001'}/api/v1`;
+const API_BASE_URL = apiConfig.baseUrl;
 
 // Helper to get access token from localStorage
 const getAccessToken = () => {

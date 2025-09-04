@@ -23,6 +23,7 @@ Preferred communication style: Simple, everyday language.
 - **UI Library**: Bootstrap 5 with custom dashboard components
 - **Routing**: React Router for client-side navigation
 - **Data Fetching**: Axios with React Query for efficient API communication and caching
+- **Configuration**: Centralized API configuration system with environment-aware URL handling for seamless local and cloud deployment
 
 ### Database Design
 - **ORM**: Drizzle ORM provides type-safe database interactions and automatic migration generation
