@@ -1,0 +1,171 @@
+name: Deploy to Windows EC2
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  NODE_VERSION: '18'
+  EC2_INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID }}
+  EC2_HOST: ${{ secrets.EC2_HOST }}
+  EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+  EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd api && npm ci
+        cd ../client && npm ci
+    
+    - name: Run API tests
+      run: |
+        cd api
+        npm run test
+    
+    - name: Build client
+      run: |
+        cd client
+        npm run build
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install dependencies and build
+      run: |
+        npm ci
+        cd api && npm ci
+        cd ../client && npm ci && npm run build
+    
+    - name: Create deployment package
+      run: |
+        mkdir -p deployment
+        cp -r api deployment/
+        cp -r client/dist deployment/client
+        cp package.json deployment/
+        cd deployment && zip -r ../ras-dashboard-deployment.zip .
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+    
+    - name: Upload to S3
+      run: |
+        aws s3 cp ras-dashboard-deployment.zip s3://rasdash-deployments/releases/ras-dashboard-$(date +%Y%m%d-%H%M%S).zip
+        aws s3 cp ras-dashboard-deployment.zip s3://rasdash-deployments/latest/ras-dashboard-latest.zip
+    
+    - name: Deploy to EC2
+      run: |
+        # Create deployment script
+        cat > deploy-script.ps1 << 'EOF'
+        # PowerShell deployment script for Windows Server
+        $ErrorActionPreference = "Stop"
+        
+        # Set deployment paths
+        $AppPath = "C:\inetpub\wwwroot\ras-dashboard"
+        $BackupPath = "C:\deployments\backups\$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+        $TempPath = "C:\deployments\temp"
+        
+        Write-Host "Starting deployment..."
+        
+        # Create directories if they don't exist
+        New-Item -ItemType Directory -Force -Path $AppPath, $BackupPath, $TempPath
+        
+        # Stop PM2 processes
+        try {
+            pm2 stop ras-dashboard-api
+            pm2 stop ras-dashboard-client
+        } catch {
+            Write-Host "PM2 processes not running or not found"
+        }
+        
+        # Backup current deployment
+        if (Test-Path $AppPath) {
+            Copy-Item -Path $AppPath -Destination $BackupPath -Recurse -Force
+            Write-Host "Backup created at $BackupPath"
+        }
+        
+        # Download latest deployment from S3
+        aws s3 cp s3://rasdash-deployments/latest/ras-dashboard-latest.zip $TempPath\ras-dashboard-latest.zip
+        
+        # Extract deployment
+        Expand-Archive -Path $TempPath\ras-dashboard-latest.zip -DestinationPath $TempPath\extracted -Force
+        
+        # Stop IIS
+        iisreset /stop
+        
+        # Remove old files
+        Remove-Item -Path $AppPath\* -Recurse -Force
+        
+        # Copy new files
+        Copy-Item -Path $TempPath\extracted\* -Destination $AppPath -Recurse -Force
+        
+        # Install/update dependencies
+        Set-Location $AppPath\api
+        npm install --production
+        
+        # Start PM2 processes
+        pm2 start ecosystem.config.js
+        
+        # Start IIS
+        iisreset /start
+        
+        # Cleanup temp files
+        Remove-Item -Path $TempPath -Recurse -Force
+        
+        Write-Host "Deployment completed successfully"
+        EOF
+        
+        # Copy script to EC2 and execute
+        echo "${{ secrets.EC2_PRIVATE_KEY }}" > ec2-key.pem
+        chmod 600 ec2-key.pem
+        
+        # Upload and execute deployment script
+        scp -i ec2-key.pem -o StrictHostKeyChecking=no deploy-script.ps1 ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }}:C:/deployments/
+        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }} "powershell -ExecutionPolicy Bypass -File C:/deployments/deploy-script.ps1"
+        
+        # Cleanup
+        rm -f ec2-key.pem deploy-script.ps1
+
+  health-check:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Wait for deployment
+      run: sleep 30
+      
+    - name: Health check
+      run: |
+        response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ env.EC2_HOST }}/health || echo "000")
+        if [ "$response" != "200" ]; then
+          echo "Health check failed with status: $response"
+          exit 1
+        fi
+        echo "Health check passed"
