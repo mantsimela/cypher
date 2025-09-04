@@ -29,7 +29,10 @@ const User = () => {
       // Call logout API endpoint
       if (refreshToken) {
         console.log('📡 Calling logout API...');
-        await fetch('http://localhost:3001/api/v1/auth/logout', {
+        const apiBaseUrl = window.location.hostname === 'localhost' 
+          ? 'http://localhost:3001'
+          : `${window.location.protocol}//${window.location.hostname.replace('-5000.', '-3001.')}${window.location.hostname.includes('replit.dev') ? '' : ':3001'}`;
+        await fetch(`${apiBaseUrl}/api/v1/auth/logout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

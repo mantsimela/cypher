@@ -30,7 +30,10 @@ const Login = () => {
     setError("");
     
     try {
-      const response = await fetch('http://localhost:3001/api/v1/auth/login', {
+      const apiBaseUrl = window.location.hostname === 'localhost' 
+        ? 'http://localhost:3001'
+        : `${window.location.protocol}//${window.location.hostname.replace('-5000.', '-3001.')}${window.location.hostname.includes('replit.dev') ? '' : ':3001'}`;
+      const response = await fetch(`${apiBaseUrl}/api/v1/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
