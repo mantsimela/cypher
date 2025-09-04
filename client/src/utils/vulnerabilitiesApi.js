@@ -1,6 +1,6 @@
-const API_BASE_URL = window.location.hostname === 'localhost' 
-  ? 'http://localhost:3001/api/v1'
-  : `${window.location.protocol}//${window.location.hostname.replace('-5000.', '-3001.')}${window.location.hostname.includes('replit.dev') ? '' : ':3001'}/api/v1`;
+import { buildApiUrl } from '../config/api.js';
+
+// Using centralized configuration for API URLs
 
 // Get auth token from localStorage
 const getAuthToken = () => {
@@ -31,7 +31,7 @@ export const vulnerabilitiesApi = {
     const queryParams = new URLSearchParams(params);
 
     // Use the proper vulnerabilities endpoint
-    const url = `${API_BASE_URL}/vulnerabilities?${queryParams}`;
+    const url = buildApiUrl(`/vulnerabilities?${queryParams}`);
     console.log('🌐 Making API call to:', url);
 
     const response = await fetch(url, {
@@ -46,7 +46,7 @@ export const vulnerabilitiesApi = {
 
   // Get vulnerability details by ID
   async getVulnerabilityDetails(id) {
-    const response = await fetch(`${API_BASE_URL}/vulnerabilities/${id}`, {
+    const response = await fetch(buildApiUrl(`/vulnerabilities/${id}`), {
       headers: createHeaders(),
     });
     return handleResponse(response);
@@ -54,7 +54,7 @@ export const vulnerabilitiesApi = {
 
   // Get vulnerability CVEs
   async getVulnerabilityCVEs(id) {
-    const response = await fetch(`${API_BASE_URL}/vulnerabilities/${id}/cves`, {
+    const response = await fetch(buildApiUrl(`/vulnerabilities/${id}/cves`), {
       headers: createHeaders(),
     });
     return handleResponse(response);
@@ -62,7 +62,7 @@ export const vulnerabilitiesApi = {
 
   // Get vulnerability patches
   async getVulnerabilityPatches(id) {
-    const response = await fetch(`${API_BASE_URL}/vulnerabilities/${id}/patches`, {
+    const response = await fetch(buildApiUrl(`/vulnerabilities/${id}/patches`), {
       headers: createHeaders(),
     });
     return handleResponse(response);
@@ -71,7 +71,7 @@ export const vulnerabilitiesApi = {
   // Get vulnerability assets
   async getVulnerabilityAssets(id, params = {}) {
     const queryParams = new URLSearchParams(params);
-    const response = await fetch(`${API_BASE_URL}/vulnerabilities/${id}/assets?${queryParams}`, {
+    const response = await fetch(buildApiUrl(`/vulnerabilities/${id}/assets?${queryParams}`), {
       headers: createHeaders(),
     });
     return handleResponse(response);

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { buildApiUrl } from '../../../config/api.js';
 import Content from "@/layout/content/Content";
 import Head from "@/layout/head/Head";
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -35,7 +36,7 @@ const EditDistributionGroup = () => {
   const fetchGroup = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/v1/admin/distribution-groups/${id}`, {
+      const response = await fetch(buildApiUrl(`/admin/distribution-groups/${id}`), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           'Content-Type': 'application/json',
@@ -105,7 +106,7 @@ const EditDistributionGroup = () => {
       setSubmitting(true);
       setError(null);
       
-      const response = await fetch(`/api/admin/distribution-groups/${id}`, {
+      const response = await fetch(buildApiUrl(`/admin/distribution-groups/${id}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

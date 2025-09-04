@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { buildApiUrl } from '../../../config/api.js';
 import Content from "@/layout/content/Content";
 import Head from "@/layout/head/Head";
 import { Link, useParams } from 'react-router-dom';
@@ -56,7 +57,7 @@ const GroupMembers = () => {
 
   const fetchGroupData = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/admin/distribution-groups/${id}`, {
+      const response = await fetch(buildApiUrl(`/admin/distribution-groups/${id}`), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           'Content-Type': 'application/json',
@@ -77,7 +78,7 @@ const GroupMembers = () => {
   const fetchMembers = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/v1/admin/distribution-groups/${id}/members`, {
+      const response = await fetch(buildApiUrl(`/admin/distribution-groups/${id}/members`), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           'Content-Type': 'application/json',
@@ -100,7 +101,7 @@ const GroupMembers = () => {
   const fetchAvailableUsers = async (search = '') => {
     try {
       const params = search ? `?search=${encodeURIComponent(search)}` : '';
-      const response = await fetch(`/api/admin/distribution-groups/${id}/available-users${params}`);
+      const response = await fetch(buildApiUrl(`/admin/distribution-groups/${id}/available-users${params}`));
       const data = await response.json();
       
       if (data.success) {
@@ -116,7 +117,7 @@ const GroupMembers = () => {
     
     try {
       setAddingUser(true);
-      const response = await fetch(`/api/admin/distribution-groups/${id}/members`, {
+      const response = await fetch(buildApiUrl(`/admin/distribution-groups/${id}/members`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -148,7 +149,7 @@ const GroupMembers = () => {
     }
     
     try {
-      const response = await fetch(`/api/admin/distribution-groups/${id}/members/${userId}`, {
+      const response = await fetch(buildApiUrl(`/admin/distribution-groups/${id}/members/${userId}`), {
         method: 'DELETE'
       });
       

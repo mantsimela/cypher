@@ -1,3 +1,5 @@
+import { buildApiUrl } from '../config/api.js';
+
 // Test script to verify assets API is working
 const testAssetsApi = async () => {
   console.log('🧪 Testing Assets API...');
@@ -13,7 +15,7 @@ const testAssetsApi = async () => {
     }
     
     // Test the assets endpoint
-    const response = await fetch('http://localhost:3001/api/v1/assets?limit=5', {
+    const response = await fetch(buildApiUrl('/assets?limit=5'), {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',

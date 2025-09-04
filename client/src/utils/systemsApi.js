@@ -5,10 +5,9 @@
 
 import { apiClient } from './apiClient';
 import { cacheUtils } from './apiCache';
+import { buildApiUrl } from '../config/api.js';
 
-const API_BASE_URL = window.location.hostname === 'localhost' 
-  ? 'http://localhost:3001/api/v1/systems'
-  : `${window.location.protocol}//${window.location.hostname.replace('-5000.', '-3001.')}${window.location.hostname.includes('replit.dev') ? '' : ':3001'}/api/v1/systems`;
+// Using centralized configuration for API URLs
 
 // Enhanced API request with automatic token refresh and cache management
 const makeApiRequest = async (endpoint, options = {}) => {

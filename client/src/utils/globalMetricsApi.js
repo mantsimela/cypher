@@ -1,4 +1,6 @@
-const API_BASE_URL = 'http://localhost:3001/api/v1';
+import { buildApiUrl } from '../config/api.js';
+
+// Using centralized configuration for API URLs
 
 // Get auth token from localStorage
 const getAuthToken = () => {
@@ -35,7 +37,7 @@ export const globalMetricsApi = {
    * @returns {Promise<Object>} Vulnerability metrics
    */
   async getVulnerabilityMetrics(forceRefresh = false) {
-    const url = `${API_BASE_URL}/global-metrics/vulnerability${forceRefresh ? '?forceRefresh=true' : ''}`;
+    const url = buildApiUrl(`/global-metrics/vulnerability${forceRefresh ? '?forceRefresh=true' : ''}`);
     console.log('🌐 Getting vulnerability metrics from:', url);
 
     const response = await fetch(url, {
@@ -51,7 +53,7 @@ export const globalMetricsApi = {
    * @returns {Promise<Object>} System metrics
    */
   async getSystemMetrics(forceRefresh = false) {
-    const url = `${API_BASE_URL}/global-metrics/system${forceRefresh ? '?forceRefresh=true' : ''}`;
+    const url = buildApiUrl(`/global-metrics/system${forceRefresh ? '?forceRefresh=true' : ''}`);
     console.log('🌐 Getting system metrics from:', url);
 
     const response = await fetch(url, {
@@ -67,7 +69,7 @@ export const globalMetricsApi = {
    * @returns {Promise<Object>} Asset metrics
    */
   async getAssetMetrics(forceRefresh = false) {
-    const url = `${API_BASE_URL}/global-metrics/asset${forceRefresh ? '?forceRefresh=true' : ''}`;
+    const url = buildApiUrl(`/global-metrics/asset${forceRefresh ? '?forceRefresh=true' : ''}`);
     console.log('🌐 Getting asset metrics from:', url);
 
     const response = await fetch(url, {
