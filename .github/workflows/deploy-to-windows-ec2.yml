@@ -83,6 +83,30 @@ jobs:
         aws s3 cp ras-dashboard-deployment.zip s3://rasdash-deployments/CYPHER-DEPLOYMENT/latest/ras-dashboard-latest.zip
         echo "Deployment uploaded to CYPHER-DEPLOYMENT folder with timestamp: ${TIMESTAMP}"
     
+    - name: Start EC2 instance if stopped
+      run: |
+        # Check instance state and start if needed
+        INSTANCE_STATE=$(aws ec2 describe-instances \
+          --instance-ids ${{ env.EC2_INSTANCE_ID }} \
+          --query 'Reservations[0].Instances[0].State.Name' \
+          --output text)
+        
+        echo "Current instance state: $INSTANCE_STATE"
+        
+        if [ "$INSTANCE_STATE" = "stopped" ]; then
+          echo "🚀 Starting EC2 instance..."
+          aws ec2 start-instances --instance-ids ${{ env.EC2_INSTANCE_ID }}
+          
+          echo "⏳ Waiting for instance to be running..."
+          aws ec2 wait instance-running --instance-ids ${{ env.EC2_INSTANCE_ID }}
+          
+          echo "✅ Instance started successfully"
+          echo "⏳ Waiting additional 60 seconds for services to initialize..."
+          sleep 60
+        else
+          echo "✅ Instance is already running"
+        fi
+
     - name: Deploy to EC2
       run: |
         # Create deployment script
