@@ -22,7 +22,7 @@ const client = postgres(connectionString, {
   max: 10, // Maximum number of connections
   idle_timeout: 20, // Close connections after 20 seconds of inactivity
   connect_timeout: 30, // Increased timeout for AWS RDS
-  ssl: { rejectUnauthorized: false }, // SSL configuration for AWS RDS
+  ssl: false, // Disable SSL to fix TLS handshake issues
   transform: {
     undefined: null
   }
