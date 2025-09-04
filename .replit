@@ -15,19 +15,34 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "RAS Dashboard"
+args = "Frontend"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Backend"
 
 [[workflows.workflow]]
-name = "RAS Dashboard"
+name = "Frontend"
 author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd client && npm run dev"
+waitForPort = 5000
 
 [workflows.workflow.metadata]
 outputType = "webview"
 
+[[workflows.workflow]]
+name = "Backend"
+author = "agent"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run kill-ports && npx concurrently \"cd api && PORT=8080 npm run dev\" \"cd client && npm run dev\""
-waitForPort = 5000
+args = "cd api && PORT=8080 npm run dev"
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [[ports]]
 localPort = 3001
