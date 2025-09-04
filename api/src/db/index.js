@@ -2,8 +2,21 @@ const { drizzle } = require('drizzle-orm/postgres-js');
 const postgres = require('postgres');
 const config = require('../config');
 
-// Create the connection string
-let connectionString = config.DATABASE_URL;
+// Create the connection string - Force use of AWS RDS from .env file
+let connectionString = process.env.DATABASE_URL || config.DATABASE_URL;
+
+// Override Replit's automatic database if AWS RDS URL is in .env
+const fs = require('fs');
+try {
+  const envContent = fs.readFileSync('.env', 'utf8');
+  const awsDbMatch = envContent.match(/DATABASE_URL=(.+rasdash-dev-public\.cexgrlslydeh\.us-east-1\.rds\.amazonaws\.com.+)/);
+  if (awsDbMatch) {
+    connectionString = awsDbMatch[1];
+    console.log('🔧 Using AWS RDS database from .env file');
+  }
+} catch (e) {
+  console.log('📝 Could not read .env file, using environment DATABASE_URL');
+}
 
 // If DATABASE_URL is not provided, build it from components
 if (!connectionString) {
@@ -22,7 +35,7 @@ const client = postgres(connectionString, {
   max: 10, // Maximum number of connections
   idle_timeout: 20, // Close connections after 20 seconds of inactivity
   connect_timeout: 30, // Increased timeout for AWS RDS
-  ssl: false, // Disable SSL to fix TLS handshake issues
+  ssl: connectionString.includes('rasdash-dev-public') ? { rejectUnauthorized: false } : false, // Use SSL for AWS RDS
   transform: {
     undefined: null
   }
