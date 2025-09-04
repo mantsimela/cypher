@@ -76,10 +76,12 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
     
-    - name: Upload to S3
+    - name: Upload to S3 CYPHER-DEPLOYMENT folder
       run: |
-        aws s3 cp ras-dashboard-deployment.zip s3://rasdash-deployments/releases/ras-dashboard-$(date +%Y%m%d-%H%M%S).zip
-        aws s3 cp ras-dashboard-deployment.zip s3://rasdash-deployments/latest/ras-dashboard-latest.zip
+        TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+        aws s3 cp ras-dashboard-deployment.zip s3://rasdash-deployments/CYPHER-DEPLOYMENT/releases/ras-dashboard-${TIMESTAMP}.zip
+        aws s3 cp ras-dashboard-deployment.zip s3://rasdash-deployments/CYPHER-DEPLOYMENT/latest/ras-dashboard-latest.zip
+        echo "Deployment uploaded to CYPHER-DEPLOYMENT folder with timestamp: ${TIMESTAMP}"
     
     - name: Deploy to EC2
       run: |
@@ -112,8 +114,8 @@ jobs:
             Write-Host "Backup created at $BackupPath"
         }
         
-        # Download latest deployment from S3
-        aws s3 cp s3://rasdash-deployments/latest/ras-dashboard-latest.zip $TempPath\ras-dashboard-latest.zip
+        # Download latest deployment from S3 CYPHER-DEPLOYMENT folder
+        aws s3 cp s3://rasdash-deployments/CYPHER-DEPLOYMENT/latest/ras-dashboard-latest.zip $TempPath\ras-dashboard-latest.zip
         
         # Extract deployment
         Expand-Archive -Path $TempPath\ras-dashboard-latest.zip -DestinationPath $TempPath\extracted -Force
