@@ -4,6 +4,12 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  define: {
+    'process.env.NODE_ENV': JSON.stringify('development'),
+    'process.env.REACT_APP_API_BASE_URL': JSON.stringify(''),
+    'process.env.REACT_APP_DEBUG_MODE': JSON.stringify('false'),
+    global: 'globalThis'
+  },
   server: {
     port: 5000,
     host: '0.0.0.0',
