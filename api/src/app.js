@@ -76,6 +76,17 @@ app.use(express.urlencoded({ extended: true }));
 // Setup Swagger documentation
 swaggerSetup(app);
 
+// Root endpoint for API information
+app.get('/', (req, res) => {
+  res.json({
+    message: 'RAS Dashboard API Server',
+    status: 'OK',
+    version: '1.0.0',
+    documentation: '/api-docs',
+    health: '/health'
+  });
+});
+
 // Health check endpoint with performance metrics
 app.get('/health', (req, res) => {
   const cacheStats = getCacheStats();
