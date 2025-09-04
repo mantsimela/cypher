@@ -19,7 +19,7 @@ args = "Frontend"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Backend"
+args = "Backend API"
 
 [[workflows.workflow]]
 name = "Frontend"
@@ -34,13 +34,12 @@ waitForPort = 5000
 outputType = "webview"
 
 [[workflows.workflow]]
-name = "Backend"
+name = "Backend API"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd api && npm run dev"
-waitForPort = 3001
 
 [workflows.workflow.metadata]
 outputType = "console"
