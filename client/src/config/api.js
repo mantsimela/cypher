@@ -18,17 +18,17 @@ const getApiBaseUrl = () => {
 
   // For local development
   if (isLocalhost) {
-    return 'http://localhost:3001/api/v1';
+    return 'http://localhost:8080/api/v1';
   }
 
   // For Replit environment - construct URL dynamically
   if (window.location.hostname.includes('replit.dev')) {
-    const baseUrl = window.location.hostname.replace('-5000.', '-3001.');
+    const baseUrl = window.location.hostname.replace('-5000.', '-8080.');
     return `${window.location.protocol}//${baseUrl}/api/v1`;
   }
 
   // For other cloud environments, try to construct from current domain
-  const port = isDevelopment ? ':3001' : '';
+  const port = isDevelopment ? ':8080' : '';
   return `${window.location.protocol}//${window.location.hostname}${port}/api/v1`;
 };
 
