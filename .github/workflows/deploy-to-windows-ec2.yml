@@ -8,9 +8,9 @@ on:
 
 env:
   NODE_VERSION: '18'
-  EC2_INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID }}
-  EC2_HOST: ${{ secrets.EC2_HOST }}
-  EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+  EC2_INSTANCE_ID: 'i-0403b69b66141f5aa'
+  EC2_HOST: '18.233.35.219'
+  EC2_USERNAME: 'Administrator'
   EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
 
 jobs:
