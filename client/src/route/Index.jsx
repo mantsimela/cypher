@@ -98,6 +98,9 @@ const ScanSettings = React.lazy(() => import("@/pages/scan-management/Settings")
 // Scanner Test Page
 const ScannerTest = React.lazy(() => import("@/pages/ScannerTest"));
 
+// System Test Page
+const TestPage = React.lazy(() => import("@/pages/TestPage"));
+
 // Document Management - Direct imports for better reliability
 const DocumentLibrary = React.lazy(() => import("@/pages/document-management/DocumentLibrary"));
 const UploadDocument = React.lazy(() => import("@/pages/document-management/UploadDocument"));
@@ -274,6 +277,7 @@ const Pages = () => {
               <Route path="dashboard-creator" element={<Suspense fallback={<PageLoader />}><DashboardCreator /></Suspense>}></Route>
 
               <Route path="_blank" element={<Suspense fallback={<PageLoader />}><Blank /></Suspense>}></Route>
+              <Route path="test" element={<Suspense fallback={<PageLoader />}><TestPage /></Suspense>}></Route>
 
               {/*Systems Management*/}
               <Route path="systems" element={<Suspense fallback={<PageLoader />}><SystemsMain /></Suspense>}></Route>
