@@ -27,6 +27,11 @@ const getApiBaseUrl = () => {
     return 'https://0d7b7a2f-2e76-4e54-b4f4-092df401269e-00-2tuha9lphc0vy.riker.replit.dev:8080/api/v1';
   }
 
+  // For Windows Server deployment (static IP)
+  if (window.location.hostname === '18.233.35.219' || process.env.NODE_ENV === 'production') {
+    return `${window.location.protocol}//${window.location.hostname}/api`;
+  }
+
   // For other cloud environments, try to construct from current domain
   const port = isDevelopment ? ':8080' : '';
   return `${window.location.protocol}//${window.location.hostname}${port}/api/v1`;
@@ -39,6 +44,12 @@ const getApiHost = () => {
   if (window.location.hostname.includes('replit.dev')) {
     return 'https://0d7b7a2f-2e76-4e54-b4f4-092df401269e-00-2tuha9lphc0vy.riker.replit.dev:8080';
   }
+  
+  // For Windows Server deployment
+  if (window.location.hostname === '18.233.35.219' || process.env.NODE_ENV === 'production') {
+    return `${window.location.protocol}//${window.location.hostname}`;
+  }
+  
   const baseUrl = getApiBaseUrl();
   return baseUrl.replace('/api/v1', '');
 };
