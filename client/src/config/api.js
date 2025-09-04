@@ -23,8 +23,8 @@ const getApiBaseUrl = () => {
 
   // For Replit environment - construct URL dynamically
   if (window.location.hostname.includes('replit.dev')) {
-    const baseUrl = window.location.hostname.replace('-5000.', '-8080.');
-    return `${window.location.protocol}//${baseUrl}/api/v1`;
+    // Use the specific backend URL that we know works
+    return 'https://0d7b7a2f-2e76-4e54-b4f4-092df401269e-00-2tuha9lphc0vy.riker.replit.dev:8080/api/v1';
   }
 
   // For other cloud environments, try to construct from current domain
@@ -36,6 +36,9 @@ const getApiBaseUrl = () => {
  * Get the API host (without /api/v1 path)
  */
 const getApiHost = () => {
+  if (window.location.hostname.includes('replit.dev')) {
+    return 'https://0d7b7a2f-2e76-4e54-b4f4-092df401269e-00-2tuha9lphc0vy.riker.replit.dev:8080';
+  }
   const baseUrl = getApiBaseUrl();
   return baseUrl.replace('/api/v1', '');
 };
