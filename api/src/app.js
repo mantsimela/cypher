@@ -38,11 +38,29 @@ app.use(rateLimit);
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: [
-    'http://localhost:3000',  // Client on port 3000
-    'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175',
-    'http://localhost:5176', 'http://localhost:5177'  // Vite dev server fallback ports
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow all origins in development
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
+    // In production, check against allowed origins
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5000',
+      'https://0d7b7a2f-2e76-4e54-b4f4-092df401269e-00-2tuha9lphc0vy.riker.replit.dev'
+    ];
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    
+    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+    return callback(new Error(msg), false);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
