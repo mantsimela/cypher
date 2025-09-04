@@ -15,27 +15,39 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "RAS Dashboard"
+args = "Frontend"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Backend"
 
 [[workflows.workflow]]
-name = "RAS Dashboard"
+name = "Frontend"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev"
+args = "cd client && npm run dev"
 waitForPort = 5000
 
 [workflows.workflow.metadata]
 outputType = "webview"
 
+[[workflows.workflow]]
+name = "Backend"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd api && npm run dev"
+waitForPort = 3001
+
+[workflows.workflow.metadata]
+outputType = "console"
+
 [[ports]]
 localPort = 3001
 externalPort = 3001
-
-[[ports]]
-localPort = 5000
-externalPort = 80
 
 [deployment]
 deploymentTarget = "cloudrun"
